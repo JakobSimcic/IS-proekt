@@ -1,0 +1,76 @@
+﻿@model IEnumerable<bojan_recipe.Models.Recipe>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+    .card-img-top {
+        object-fit: cover;
+        height: 200px; /* Set the desired height */
+        width: 100%; /* Ensure it takes the full width of the container */
+    }
+
+    .card-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 5; /* Adjust the number of lines to display */
+        -webkit-box-orient: vertical;
+    }
+</style>
+
+<div class="container">
+    <h1>Recipes</h1>
+    <a class="btn btn-primary" style="margin-bottom: 40px" asp-action="Create">Create New Recipe</a>
+</div>
+<hr />
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
+                <div class="card-body">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="card-text">@Html.Raw(System.Text.RegularExpressions.Regex.Replace(item.Description, @"<[^>]+>", string.Empty).Split(' ').Length > 30 ? string.Join(" ", item.Description.Split(' ').Take(30)) + "..." : item.Description)</p>
+                    <p class="card-text"><strong>Calories:</strong> @item.CaloryCount</p>
+                    <p class="card-text"><strong>Type of Recipe:</strong> @item.Type</p>
+
+                    @if (item.Type == bojan_recipe.Models.RecipeType.Food)
+                    {
+                        <p class="card-text"><strong>Type of Food:</strong> @item.FoodType</p>
+                    }
+                    else if (item.Type == bojan_recipe.Models.RecipeType.Drink)
+                    {
+                        <p class="card-text">
+                            <strong>Alcoholic:</strong>
+                            @if (item.Type == bojan_recipe.Models.RecipeType.Drink)
+                            {
+                                @if (item.IsAlcoholic)
+                                {
+                                    <span>Yes</span>
+                                }
+                                else
+                                {
+                                    <span>No</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>N/A</span>
+                            }
+                        </p>
+                    }
+
+                    <div class="text-center">
+                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-primary">Details</a>
+                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-secondary">Edit</a>
+                        <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
