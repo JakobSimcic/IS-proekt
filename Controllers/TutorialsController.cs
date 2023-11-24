@@ -21,11 +21,23 @@ namespace bojan_recipe.Controllers
         }
 
         // GET: Tutorials
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string filterType)
         {
-              return _context.Tutorial != null ? 
-                          View(await _context.Tutorial.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Tutorial'  is null.");
+            var tutorials = from t in _context.Tutorial
+                          select t;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                tutorials = tutorials.Where(t => t.TutorialName.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(filterType))
+            {
+                Enum.TryParse(filterType, out TutorialCategory type);
+                tutorials = tutorials.Where(t => t.Category == type);
+            }
+
+            return View(await tutorials.ToListAsync());
         }
 
         // GET: Tutorials/Details/5

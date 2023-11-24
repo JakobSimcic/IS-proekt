@@ -21,11 +21,23 @@ namespace bojan_recipe.Controllers
         }
 
         // GET: Recipes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string filterType)
         {
-              return _context.Recipe != null ? 
-                          View(await _context.Recipe.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Recipe'  is null.");
+            var recipes = from r in _context.Recipe
+                          select r;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                recipes = recipes.Where(r => r.Name.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(filterType))
+            {
+                Enum.TryParse(filterType, out RecipeType type);
+                recipes = recipes.Where(r => r.Type == type);
+            }
+
+            return View(await recipes.ToListAsync());
         }
 
         // GET: Recipes/Details/5
