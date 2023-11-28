@@ -1,4 +1,4 @@
-# IS proekt (Food & Wine)
+# IS projekt (Food & Wine)
 
 Application made for the purpose of the subject Information Systems at the Faculty of Computer and Information Science at the University of Ljubljana.
 
