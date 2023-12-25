@@ -32,5 +32,6 @@ namespace bojan_recipe.Models
 
         // If the recipe is for Drink:
         public bool IsAlcoholic { get; set; } // True if the drink contains alcohol
+        public ApplicationUser? Owner { get; set; }
     }
 }

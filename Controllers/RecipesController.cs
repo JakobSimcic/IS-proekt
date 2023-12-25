@@ -8,16 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using bojan_recipe.Data;
 using bojan_recipe.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace bojan_recipe.Controllers
 {
-    public class RecipesController : Controller
-    {
-        private readonly ApplicationDbContext _context;
 
-        public RecipesController(ApplicationDbContext context)
+    public class RecipesController : Controller
+    {   
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
+
+        public RecipesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _usermanager = userManager;
         }
 
         // GET: Recipes
@@ -75,6 +79,7 @@ namespace bojan_recipe.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,Preparation,Ingredients,ImageUrl,CaloryCount,Type,FoodType,IsAlcoholic")] Recipe recipe)
         {
+
             if (ModelState.IsValid)
             {
                 _context.Add(recipe);
@@ -101,7 +106,12 @@ namespace bojan_recipe.Controllers
             // Retrieve options for Type and FoodType fields
             ViewBag.TypeList = new SelectList(Enum.GetValues(typeof(RecipeType)).Cast<RecipeType>());
             ViewBag.FoodTypeList = new SelectList(Enum.GetValues(typeof(FoodType)).Cast<FoodType>());
+            var currentUser = await _usermanager.GetUserAsync(User);
+            if (recipe.Owner == currentUser)
+            {
+                return RedirectToAction(nameof(Index));
 
+            }
             return View(recipe);
         }
 
@@ -155,7 +165,12 @@ namespace bojan_recipe.Controllers
             {
                 return NotFound();
             }
+            var currentUser = await _usermanager.GetUserAsync(User);
+            if (recipe.Owner == currentUser)
+            {
+                return RedirectToAction(nameof(Index));
 
+            }
             return View(recipe);
         }
 
